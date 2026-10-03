@@ -1,58 +1,45 @@
-# Pattern Recognition — Assignment 4
+# Pattern Recognition, assignment 4
 
-A problem set on **neural networks, autoencoders, and ensemble methods**, completed during the Pattern Recognition course at Democritus University of Thrace (Fall 2023).
+Neural networks, autoencoders and decision trees. Fourth assignment of the Pattern Recognition course at the Democritus University of Thrace (Fall 2023).
 
-## Problem set overview
+| # | Topic | Data | Notebook |
+|---|---|---|---|
+| 1 | A neural network with one hidden layer of 30 neurons (scikit-learn `MLPClassifier`, logistic activation), compared with ReLU. Then a larger tuned network (more neurons, regularization, different learning rate, warm start), the confusion matrix, and precision-recall curves with AUC per class | UCI Iris | [`Askisi_1_NeuralNet_IRIS.ipynb`](code/Askisi_1_NeuralNet_IRIS.ipynb) |
+| 2 | An autoencoder in PyTorch whose encoder has layers of 128, 32 and 3 units and a mirrored decoder, trained with MSE. The 3-D latent space of the training and test sets, and images decoded from random points of the latent space | MNIST | [`Askisi_2_Autoencoder_MNIST.ipynb`](code/Askisi_2_Autoencoder_MNIST.ipynb) |
+| 3 | A decision tree of depth 5 with mean imputation of missing values (parts A and B of the exercise) | UCI Breast Cancer Wisconsin (Diagnostic) | [`Askisi_3_RandomForest_BreastCancer.ipynb`](code/Askisi_3_RandomForest_BreastCancer.ipynb) |
 
-Three exercises covering supervised neural networks, unsupervised representation learning, and tree-based ensembles — implemented in Python / Jupyter (TensorFlow / Keras + scikit-learn).
+The solutions, with figures, are in [`report/Report_HW04.pdf`](report/Report_HW04.pdf), in Greek.
 
-| # | Topic | Methods | Dataset | Notebook |
-|---|---|---|---|---|
-| 1 | Supervised classification with a feed-forward neural network | 2-layer NN (30 sigmoid neurons); training-curve analysis; **sigmoid vs ReLU** activation comparison; hyperparameter experimentation (depth, width, learning rate, dropout, warm start); confusion matrix; **per-class precision-recall + AUC** | UCI IRIS (150 samples, 3 species) | [`Askisi_1_NeuralNet_IRIS.ipynb`](code/Askisi_1_NeuralNet_IRIS.ipynb) |
-| 2 | Unsupervised representation learning with an autoencoder | **Autoencoder** with encoder layers 128/32/3 and mirrored decoder; **MSE** comparison vs. a reference architecture; **3-D latent-space visualisation** colour-coded by digit; latent-space exploration — sampling random points and decoding to images to study what regions correspond to real digits | MNIST | [`Askisi_2_Autoencoder_MNIST.ipynb`](code/Askisi_2_Autoencoder_MNIST.ipynb) |
-| 3 | Tree-based classification, ensembles, and missing-data robustness | Single **Decision Tree** (max depth 5) on 10 %-missing training data; **Random Forest** (100 trees, depth 3, 5 features/tree, no bootstrap); **feature importance** comparison; **2-D sensitivity sweep** of training-time vs. test-time missing rates (0 – 80 % each); precision-recall curves for the two classifiers | UCI Breast Cancer Wisconsin (569 samples, 30 features) | [`Askisi_3_RandomForest_BreastCancer.ipynb`](code/Askisi_3_RandomForest_BreastCancer.ipynb) |
+## Findings
+
+- Iris: the network with 30 logistic neurons reaches 0.97 accuracy on a 20% test split. With ReLU it converges faster, but the accuracy is slightly lower and less stable. The tuned network reaches 1.00 on its split.
+- MNIST: the autoencoder reaches a training MSE of about 0.03, against about 0.008 for the network of the lab session. The report attributes the difference to the training parameters.
+- Breast Cancer: the decision tree reaches 0.953 accuracy on a 30% test split.
 
 ## Repository structure
 
 ```
 .
-├── report/Report_HW04.pdf                           # Solutions, figures, and discussion (Greek)
+├── report/Report_HW04.pdf
 └── code/
-    ├── Askisi_1_NeuralNet_IRIS.ipynb                # Feed-forward NN classifier on IRIS
-    ├── Askisi_2_Autoencoder_MNIST.ipynb             # Autoencoder + latent-space exploration on MNIST
-    └── Askisi_3_RandomForest_BreastCancer.ipynb     # Decision Tree + Random Forest with missing data
+    ├── Askisi_1_NeuralNet_IRIS.ipynb
+    ├── Askisi_2_Autoencoder_MNIST.ipynb
+    └── Askisi_3_RandomForest_BreastCancer.ipynb
 ```
-
-The report is in Greek and embeds the original problem statement before each answer, so the assignment context is preserved without needing a separate brief. README and notebook prose are mostly English.
-
-## Selected findings
-
-- **IRIS (Exercise 1):** A 2-layer (30-neuron, sigmoid) network reached high test accuracy on the 80/20 split. Switching to **ReLU** converged faster but with a slight accuracy drop at the same hyperparameters; final tuned network (added neurons, regularisation, warm start, tuned learning rate) gave the best stability. **Iris Virginica** turned out to be the easiest class to separate by AUC of its precision-recall curve.
-- **MNIST autoencoder (Exercise 2):** The custom 128 → 32 → 3 → 32 → 128 architecture reached **MSE ≈ 0.03** on training, vs. **≈ 0.008** for the lab-session reference network — the gap traces to architecture and training-protocol differences. The 3-D latent space showed clear per-digit clusters that are largely preserved between train and test, with some cluster overlap due to the aggressive compression. Sampling random latent points and decoding revealed that **most of the 3-D latent volume does not map to recognisable digits** — only the regions populated by training-data encodings produce digit-like reconstructions.
-- **Breast Cancer (Exercise 3):** A 5-deep decision tree trained with 10 % missing values still produced a reasonable baseline; **Random Forest** improved on it as expected. The 2-D missing-data sweep showed RF is **markedly more sensitive to missing values in the test set than in the training set** — once test-time missingness exceeds ~30 %, accuracy degrades sharply regardless of training-time missingness. In the precision-recall framing for malignancy detection, **recall** matters most (false negatives = missed cancers), which guided classifier choice.
-
-See the report PDF for figures, confusion matrices, and full numerical comparisons.
 
 ## Running the code
 
-Python 3.10+ recommended. Suggested setup:
-
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install jupyter numpy pandas matplotlib scikit-learn tensorflow
+pip install jupyter numpy pandas matplotlib scikit-learn torch torchvision ucimlrepo
 jupyter notebook code/
 ```
 
-The IRIS and Breast Cancer datasets ship with scikit-learn; MNIST is fetched through `tensorflow.keras.datasets.mnist`. No external data files required.
-
-## Course
-
-Pattern Recognition (Αναγνώριση Προτύπων) — Department of Electrical & Computer Engineering, Democritus University of Thrace. Fall 2023.
+Iris and Breast Cancer Wisconsin are downloaded with `ucimlrepo` and MNIST with `torchvision`.
 
 ## License
 
-[MIT](LICENSE) — shared as-is for educational reference.
+MIT, see [LICENSE](LICENSE).
 
 ## Author
 
-[Dimitrios Anastasoudis](https://github.com/anastasoudis) · [LinkedIn](https://linkedin.com/in/anastasoudis)
+[Dimitrios Anastasoudis](https://github.com/anastasoudis), [LinkedIn](https://linkedin.com/in/anastasoudis)
